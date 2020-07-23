@@ -1,5 +1,5 @@
 CONFIG_NAME: 'MirrorGAN'
-DATASET_NAME: 'birds'
+DATASET_NAME: 'comp_birds'
 DATA_DIR: '/home/seth/code/MirrorGAN/data/birds'
 GPU_ID: 0
 WORKERS: 4
@@ -30,8 +30,8 @@ CAP:
     hidden_size: 256
     num_layers: 1
     learning_rate: 0.001
-    caption_cnn_path: '/home/seth/code/output/birds_STREAM_2020_06_29_22_00_25/Model/encoder-9.ckpt'
-    caption_rnn_path: '/home/seth/code/output/birds_STREAM_2020_06_29_22_00_25/Model/decoder-9.ckpt'
+    caption_cnn_path: '/data/seth/MirrorGAN/output/birds_STREAM_2020_07_23_12_11_07/Model/encoder-50.ckpt'
+    caption_rnn_path: '/data/seth/MirrorGAN/output/birds_STREAM_2020_07_23_12_11_07/Model/decoder-50.ckpt'
 
 GAN:
     DF_DIM: 64

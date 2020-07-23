@@ -439,7 +439,7 @@ class GET_IMAGE_G(nn.Module):
         self.gf_dim = ngf
         self.img = nn.Sequential(
             conv3x3(ngf, 3),
-            nn.Tanh()
+            # nn.Tanh()
         )
 
     def forward(self, h_code):

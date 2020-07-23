@@ -1,9 +1,9 @@
-CONFIG_NAME: 'MirrorGAN'
+CONFIG_NAME: 'STREAM'
 DATASET_NAME: 'birds'
 DATA_DIR: '/home/seth/code/MirrorGAN/data/birds'
-GPU_ID: 0
+GPU_ID: 3
 WORKERS: 4
-OUTPUT_PATH: '/data/seth/MirrorGAN'
+OUTPUT_PATH: '/data/seth/MirrorGAN/'
 TREE:
     BRANCH_NUM: 3
 
@@ -12,12 +12,12 @@ TRAIN:
     NET_G: ''
     B_NET_D: True
     BATCH_SIZE: 12  # 22
-    MAX_EPOCH: 300
+    MAX_EPOCH: 650
     SNAPSHOT_INTERVAL: 50
     DISCRIMINATOR_LR: 0.0002
     GENERATOR_LR: 0.0002
 
-    NET_E: '/home/seth/code/MirrorGAN/data/STEM/bird/text_encoder.pth'
+    NET_E: '../data/STEM/text_encoder.pth'
     SMOOTH:
         GAMMA1: 4.0  # 1,2,5 good 4 best  10&100bad
         GAMMA2: 5.0
@@ -30,8 +30,8 @@ CAP:
     hidden_size: 256
     num_layers: 1
     learning_rate: 0.001
-    caption_cnn_path: '/home/seth/code/output/birds_STREAM_2020_06_29_22_00_25/Model/encoder-9.ckpt'
-    caption_rnn_path: '/home/seth/code/output/birds_STREAM_2020_06_29_22_00_25/Model/decoder-9.ckpt'
+    caption_cnn_path: '../data/STREAM/cnn_encoder.ckpt'
+    caption_rnn_path: '../data/STREAM/rnn_decoder.ckpt'
 
 GAN:
     DF_DIM: 64

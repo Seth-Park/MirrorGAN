@@ -1,7 +1,8 @@
 from __future__ import print_function
 
 from cfg.config import cfg, cfg_from_file
-from datasets import TextDataset
+from datasets import TextDataset, TextDatasetCOCO, TextDatasetCompCOCO
+from datasets import TextDatasetCompCUB
 from trainer import Trainer as trainer
 
 import os
@@ -110,18 +111,41 @@ if __name__ == "__main__":
 
     split_dir, bshuffle = 'train', True
     if not cfg.TRAIN.FLAG:
-        # bshuffle = False
+        bshuffle = False
+        # split_dir = 'test_seen'
         split_dir = 'test'
 
     # Get data loader
     imsize = cfg.TREE.BASE_SIZE * (2 ** (cfg.TREE.BRANCH_NUM - 1))
     image_transform = transforms.Compose([
-        transforms.Scale(int(imsize * 76 / 64)),
+        transforms.Resize(int(imsize * 76 /64)),
         transforms.RandomCrop(imsize),
-        transforms.RandomHorizontalFlip()])
-    dataset = TextDataset(cfg.DATA_DIR, split_dir,
-                          base_size=cfg.TREE.BASE_SIZE,
-                          transform=image_transform)
+        transforms.RandomHorizontalFlip()
+    ])
+    norm = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(
+            (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
+        )
+    ])
+
+    #dataset = TextDataset(cfg.DATA_DIR, split_dir,
+    #                      base_size=cfg.TREE.BASE_SIZE,
+    #                      transform=image_transform)
+    #dataset = TextDatasetCompCOCO(
+    #    cfg.DATA_DIR,
+    #    split_dir,
+    #    base_size=cfg.TREE.BASE_SIZE,
+    #    transform=image_transform,
+    #    norm=norm
+    #)
+    dataset = TextDatasetCompCUB(
+        cfg.DATA_DIR,
+        split_dir,
+        base_size=cfg.TREE.BASE_SIZE,
+        transform=image_transform,
+        norm=norm
+    )
     assert dataset
     dataloader = torch.utils.data.DataLoader(
         dataset, batch_size=cfg.TRAIN.BATCH_SIZE,

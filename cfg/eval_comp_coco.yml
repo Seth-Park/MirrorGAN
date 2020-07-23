@@ -1,0 +1,27 @@
+CONFIG_NAME: 'MirrorGAN'
+DATASET_NAME: 'comp_coco'
+DATA_DIR: '/home/seth/code/MirrorGAN/data/coco'
+GPU_ID: 3
+WORKERS: 4
+OUTPUT_PATH: '/data/seth/MirrorGAN'
+
+B_VALIDATION: True
+TREE:
+    BRANCH_NUM: 3
+
+TRAIN:
+    FLAG: False
+    NET_G: '/data/seth/MirrorGAN/output/comp_coco_MirrorGAN_2020_07_14_23_30_40/Model/netG_epoch_100.pth'
+    B_NET_D: False
+    BATCH_SIZE: 12  # 22
+    NET_E: '/home/seth/code/MirrorGAN/data/STEM/coco/text_encoder.pth'
+GAN:
+    DF_DIM: 64
+    GF_DIM: 32
+    Z_DIM: 100
+    R_NUM: 2
+
+TEXT:
+    EMBEDDING_DIM: 256
+    CAPTIONS_PER_IMAGE: 5
+    WORDS_NUM: 15

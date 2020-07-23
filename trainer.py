@@ -9,6 +9,7 @@ from cfg.config import cfg
 from miscc.utils import mkdir_p
 from miscc.utils import build_super_images, build_super_images2
 from miscc.utils import weights_init, load_params, copy_G_params
+from miscc.utils import unnormalize
 from model import G_DCGAN, G_NET
 from datasets import prepare_data
 from model import RNN_ENCODER, CNN_ENCODER, CAPTION_CNN, CAPTION_RNN
@@ -273,7 +274,7 @@ class Trainer(object):
                     errD.backward()
                     optimizersD[i].step()
                     errD_total += errD
-                    D_logs += 'errD%d: %.2f ' % (i, errD.data[0])
+                    D_logs += 'errD%d: %.2f ' % (i, errD.item())
 
                 # (4) Update G network: maximize log(D(G(z)))
                 # compute total loss for training G
@@ -285,7 +286,7 @@ class Trainer(object):
                                    words_embs, sent_emb, match_labels, cap_lens, class_ids)
                 kl_loss = KL_loss(mu, logvar)
                 errG_total += kl_loss
-                G_logs += 'kl_loss: %.2f ' % kl_loss.data[0]
+                G_logs += 'kl_loss: %.2f ' % kl_loss.item()
                 # backward and update parameters
                 errG_total.backward()
                 optimizerG.step()
@@ -296,18 +297,18 @@ class Trainer(object):
                     print(D_logs + '\n' + G_logs)
                 # save images
                 if gen_iterations % 1000 == 0:
-                    backup_para = copy_G_params(netG)
-                    load_params(netG, avg_param_G)
+                    #backup_para = copy_G_params(netG)
+                    #load_params(netG, avg_param_G)
                     self.save_img_results(netG, fixed_noise, sent_emb,
                                           words_embs, mask, image_encoder,
-                                          captions, cap_lens, epoch, name='average')
-                    load_params(netG, backup_para)
+                                          captions, cap_lens, epoch, name='current')
+                    #load_params(netG, backup_para)
             end_t = time.time()
 
             print('''[%d/%d][%d]
                   Loss_D: %.2f Loss_G: %.2f Time: %.2fs'''
                   % (epoch, self.max_epoch, self.num_batches,
-                     errD_total.data[0], errG_total.data[0],
+                     errD_total.item(), errG_total.item(),
                      end_t - start_t))
 
             if epoch % cfg.TRAIN.SNAPSHOT_INTERVAL == 0:  # and epoch != 0:
@@ -338,8 +339,8 @@ class Trainer(object):
         if cfg.TRAIN.NET_G == '':
             print('Error: the path for model is not found!')
         else:
-            if split_dir == 'test':
-                split_dir = 'valid'
+            #if split_dir == 'test':
+            #    split_dir = 'valid'
             # Build and load the generator
             if cfg.GAN.B_DCGAN:
                 netG = G_DCGAN()
@@ -398,21 +399,21 @@ class Trainer(object):
                     # (2) Generate fake images
                     noise.data.normal_(0, 1)
                     fake_imgs, _, _, _ = netG(noise, sent_emb, words_embs, mask)
+                    fake_imgs = unnormalize(fake_imgs[-1].detach().cpu()).mul_(255).clamp(0, 255)
                     for j in range(batch_size):
-                        s_tmp = '%s/single/%s' % (save_dir, keys[j])
+                        s_tmp = '%s/single/%s_%d' % (save_dir, keys[j], class_ids[j])
                         folder = s_tmp[:s_tmp.rfind('/')]
                         if not os.path.isdir(folder):
                             print('Make a new folder: ', folder)
                             mkdir_p(folder)
-                        k = -1
                         # for k in range(len(fake_imgs)):
-                        im = fake_imgs[k][j].data.cpu().numpy()
+                        im = fake_imgs[j].numpy()
                         # [-1, 1] --> [0, 255]
-                        im = (im + 1.0) * 127.5
+                        #im = (im + 1.0) * 127.5
                         im = im.astype(np.uint8)
                         im = np.transpose(im, (1, 2, 0))
                         im = Image.fromarray(im)
-                        fullpath = '%s_s%d.png' % (s_tmp, k)
+                        fullpath = '%s.png' % s_tmp
                         im.save(fullpath)
 
     def gen_example(self, data_dic):
